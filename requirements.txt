@@ -1,0 +1,11 @@
+# Framework principal
+django
+
+# Para criar a API REST
+djangorestframework
+
+# Adaptador para conectar o Django ao PostgreSQL
+psycopg2-binary
+
+# Para ler variáveis de ambiente de um arquivo .env
+python-dotenv
