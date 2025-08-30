@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
     # Terceiros
     'rest_framework', #pip install djangorestframework
+    'drf_spectacular', #pip install drf-spectacular
 
     # Locais
     'automacao',
@@ -136,3 +137,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}

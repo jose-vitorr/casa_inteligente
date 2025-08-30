@@ -9,3 +9,6 @@ psycopg2-binary
 
 # Para ler variáveis de ambiente de um arquivo .env
 python-dotenv
+
+# Documentacaoo da API
+drf-spectacular
