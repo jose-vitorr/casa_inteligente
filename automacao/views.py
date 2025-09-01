@@ -1,24 +1,31 @@
 from django.shortcuts import render
 from rest_framework import viewsets, status
-from rest_framework.decorators import action 
+from rest_framework.decorators import action
+from drf_spectacular.utils import extend_schema
 from .models import House, Room, Device, Scene, SceneAction
-from .serializers import HouseSerializer, RoomSerializer, DeviceSerializer, SceneSerializer, SceneActionSerializer
+from .serializers import HouseSerializer, RoomSerializer, DeviceSerializer, SceneActivationSerializer, SceneSerializer, SceneActionSerializer, DeviceStateSerializer
 
 # Create your views here.
 class HouseViewSet(viewsets.ModelViewSet):
     queryset = House.objects.all()
     serializer_class = HouseSerializer
-
+    filterset_fields = ['owner']
 
 class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
+    filterset_fields = ['house']
 
 
 class DeviceViewSet(viewsets.ModelViewSet):
     queryset = Device.objects.all()
     serializer_class = DeviceSerializer # Serializer refinado
+    filterset_fields = ['room']
     
+    @extend_schema(
+        request=DeviceStateSerializer,
+        responses={200: DeviceSerializer},
+    )
     @action(detail=True, methods=['post'])
     def set_state(self, request, pk=None):
         """
@@ -42,6 +49,7 @@ class DeviceViewSet(viewsets.ModelViewSet):
 class SceneViewSet(viewsets.ModelViewSet):
     queryset = Scene.objects.all()
     serializer_class = SceneSerializer
+    filterset_fields = ['house']
 
     # A antiga ação 'activate' agora é 'execute' e tem nova lógica
     @action(detail=True, methods=['post'])
@@ -80,6 +88,10 @@ class SceneViewSet(viewsets.ModelViewSet):
             status=status.HTTP_200_OK
         )
 
+    @extend_schema(
+        request=SceneActivationSerializer,
+        responses={200: SceneSerializer},
+    )
     @action(detail=True, methods=['patch'])
     def toggle_activation(self, request, pk=None):
         """
@@ -103,3 +115,5 @@ class SceneViewSet(viewsets.ModelViewSet):
 class SceneActionViewSet(viewsets.ModelViewSet):
     queryset = SceneAction.objects.all()
     serializer_class = SceneActionSerializer
+    filterset_fields = ['scene']
+

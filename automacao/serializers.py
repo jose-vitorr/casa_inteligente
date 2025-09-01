@@ -164,3 +164,30 @@ class HouseSerializer(serializers.ModelSerializer):
         if not value or len(value.strip()) < 2:
             raise serializers.ValidationError("O nome do proprietário deve ter pelo menos 2 caracteres.")
         return value.strip()
+
+class DeviceStateSerializer(serializers.ModelSerializer):
+    '''Serializador para atualizar o estado de um dispositivo'''	
+    activated = serializers.BooleanField(required=True)
+
+    class Meta:
+        model = Device
+        fields = ['activated']
+
+    def validate_activated(self, value):
+        # Valida se o estado é um booleano
+        if not isinstance(value, bool):
+            raise serializers.ValidationError("O estado deve ser um booleano.")
+        return value
+
+class SceneActivationSerializer(serializers.ModelSerializer):
+    '''Serializador para ativar/desativar uma cena'''	
+    activated = serializers.BooleanField(required=True)
+
+    class Meta:
+        model = Scene
+        fields = ['activated']
+
+    def validate_activated(self, value):
+        # Valida se o estado é um booleano
+        if not isinstance(value, bool):
+            raise serializers.ValidationError("O estado deve ser um booleano.")

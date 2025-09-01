@@ -12,3 +12,6 @@ python-dotenv
 
 # Documentacaoo da API
 drf-spectacular
+
+# Filtros da API
+django-filter

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # Terceiros
     'rest_framework', #pip install djangorestframework
     'drf_spectacular', #pip install drf-spectacular
+    'django_filters', #pip install django-filter
 
     # Locais
     'automacao',
@@ -140,4 +141,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
