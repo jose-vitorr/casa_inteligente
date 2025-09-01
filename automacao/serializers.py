@@ -165,29 +165,29 @@ class HouseSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("O nome do proprietário deve ter pelo menos 2 caracteres.")
         return value.strip()
 
-class DeviceStateSerializer(serializers.ModelSerializer):
+class DeviceStateSerializer(serializers.Serializer):
     '''Serializador para atualizar o estado de um dispositivo'''	
     activated = serializers.BooleanField(required=True)
-
-    class Meta:
-        model = Device
-        fields = ['activated']
-
+    
     def validate_activated(self, value):
         # Valida se o estado é um booleano
         if not isinstance(value, bool):
             raise serializers.ValidationError("O estado deve ser um booleano.")
         return value
 
-class SceneActivationSerializer(serializers.ModelSerializer):
+class SceneActivationSerializer(serializers.Serializer):
     '''Serializador para ativar/desativar uma cena'''	
     activated = serializers.BooleanField(required=True)
-
-    class Meta:
-        model = Scene
-        fields = ['activated']
 
     def validate_activated(self, value):
         # Valida se o estado é um booleano
         if not isinstance(value, bool):
             raise serializers.ValidationError("O estado deve ser um booleano.")
+
+class SceneActionBulkUpdateSerializer(serializers.Serializer):
+    """Serializador para atualizar várias ações de uma cena"""
+
+    device_id = serializers.IntegerField(required=True)
+    order = serializers.IntegerField(min_value=1, required=True)
+    newState = serializers.BooleanField(required=True)
+    interval = serializers.IntegerField(min_value=0, default=0)

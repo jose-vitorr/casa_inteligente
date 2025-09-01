@@ -1,9 +1,13 @@
 from django.shortcuts import render
+from django.db import transaction
+
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.response import Response
+
 from drf_spectacular.utils import extend_schema
 from .models import House, Room, Device, Scene, SceneAction
-from .serializers import HouseSerializer, RoomSerializer, DeviceSerializer, SceneActivationSerializer, SceneSerializer, SceneActionSerializer, DeviceStateSerializer
+from .serializers import HouseSerializer, RoomSerializer, DeviceSerializer, SceneActionBulkUpdateSerializer, SceneActivationSerializer, SceneSerializer, SceneActionSerializer, DeviceStateSerializer
 
 # Create your views here.
 class HouseViewSet(viewsets.ModelViewSet):
@@ -110,6 +114,55 @@ class SceneViewSet(viewsets.ModelViewSet):
             {'status': f'A cena "{scene.name}" agora está {"ativada" if scene.activated else "desativada"}.'},
             status=status.HTTP_200_OK
         )
+
+    @extend_schema(
+        request=SceneActionBulkUpdateSerializer(many=True),
+        responses={200: SceneSerializer},
+    )
+    @action(detail=True, methods=['post'])
+    def set_scene_actions(self, request, pk=None):
+        """
+        Atualiza as ações de uma cena.
+        """
+        scene = self.get_object()
+
+        # Validando o corpo da requisição
+        serializer = SceneActionBulkUpdateSerializer(data=request.data, many=True)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        validated_data = serializer.validated_data
+
+        try:
+            # A transação garante que todas as operações sejam executadas ou nenhuma delas
+            with transaction.atomic():
+                # Deleta todas as ações existentes da cena
+                scene.actions.all().delete()
+
+                # Cria as novas ações
+                new_actions = []
+                for new_action in validated_data:
+                    new_actions.append(SceneAction(
+                        scene=scene, 
+                        device_id=new_action['device_id'],
+                        order=new_action['order'],
+                        newState=new_action['newState'],
+                        interval=new_action['interval']
+                        )
+                    )
+
+                # Persiste as novas ações
+                SceneAction.objects.bulk_create(new_actions)
+
+
+        except Exception as e:
+            # Se qualquer erro ocorrer, a transação é desfeita (rollback)
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # Retorna a cena atualizada com a nova lista de ações
+        updated_scene_serializer = self.get_serializer(scene)
+        return Response(updated_scene_serializer.data, status=status.HTTP_201_CREATED)
 
 
 class SceneActionViewSet(viewsets.ModelViewSet):
