@@ -15,3 +15,6 @@ drf-spectacular
 
 # Filtros da API
 django-filter
+
+# CORS
+django-cors-headers

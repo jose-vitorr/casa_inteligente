@@ -46,12 +46,14 @@ INSTALLED_APPS = [
     'rest_framework', #pip install djangorestframework
     'drf_spectacular', #pip install drf-spectacular
     'django_filters', #pip install django-filter
+    'corsheaders', #pip install django-cors-headers
 
     # Locais
     'automacao',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', #pip install django-cors-headers
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -143,3 +145,5 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
+
+CORS_ALLOW_ALL_ORIGINS = True
